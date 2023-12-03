@@ -1,0 +1,5 @@
+# STM32F401VC-DISCO board configuration
+
+config BOARD_STM32F401VC_DISCO
+	bool "STM32F401VC-DISCO Development Board"
+	depends on SOC_STM32F401XC
