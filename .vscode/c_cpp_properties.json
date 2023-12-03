@@ -7,9 +7,10 @@
             "cppStandard": "gnu++20",
             "intelliSenseMode": "linux-gcc-x64",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${config:zephyr_base}/build/zephyr/include/**",
-                "${config:zephyr_base}/include/**"
+                "${workspaceFolder}/firmware/include",
+                "${workspaceFolder}/build/zephyr/include/generated",
+                "${config:zephyr_base}/build/zephyr/include",
+                "${config:zephyr_base}/include"
             ],
             "defines": [],
             "browse": {

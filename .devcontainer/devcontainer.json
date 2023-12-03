@@ -25,7 +25,7 @@
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
-		"devicetree.defaultBoard": "stm32f4_disco"
+		"devicetree.defaultBoard": "stm32f401vc_disco"
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
@@ -52,9 +52,9 @@
 
 	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
 	// Uncomment the following section if your host machine is running Linux
-	// "runArgs": [
-	// 	"--device=/dev/bus/usb/"
-	// ],
+	"runArgs": [
+		"--device=/dev/bus/usb/"
+	],
 
 	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
 	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
