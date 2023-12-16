@@ -48,7 +48,6 @@ int main(void)
 
     for (;;)
     {
-        leds_ctrl.toggle_all();
         k_msleep(500U);
     }
 

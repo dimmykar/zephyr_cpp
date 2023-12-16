@@ -26,6 +26,7 @@
 
 #include "led.hpp"
 
+#include <zephyr/kernel.h>
 
 class leds_controller_t final
 {
@@ -43,8 +44,15 @@ private:
     leds_controller_t &operator=(const leds_controller_t &) = delete;
     leds_controller_t &&operator=(leds_controller_t &&) = delete;
 
+    k_tid_t create_thread();
+    static void leds_update_thread(void *arg1, void *arg2, void *arg3);
+    void leds_update();
+
     led_t orange_led;
     led_t green_led;
     led_t red_led;
     led_t blue_led;
+
+    k_thread thread;
+    k_tid_t thread_handle;
 };

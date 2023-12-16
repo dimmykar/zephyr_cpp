@@ -25,12 +25,15 @@
 #include "leds_controller.hpp"
 
 #include <zephyr/kernel.h>
+#include <zephyr/kernel/thread_stack.h>
 #include <zephyr/drivers/gpio.h>
 
 #define LED_ORANGE_NODE DT_ALIAS(led0)
 #define LED_GREEN_NODE  DT_ALIAS(led1)
 #define LED_RED_NODE    DT_ALIAS(led2)
 #define LED_BLUE_NODE   DT_ALIAS(led3)
+
+K_THREAD_STACK_DEFINE(thread_stack, 1024);
 
 namespace
 {
@@ -58,6 +61,7 @@ leds_controller_t &leds_controller_t::get_instance()
 
 bool leds_controller_t::init()
 {
+    this->thread_handle = this->create_thread();
     return true;
 }
 
@@ -67,4 +71,34 @@ void leds_controller_t::toggle_all()
     this->green_led.toggle();
     this->red_led.toggle();
     this->blue_led.toggle();
+}
+
+k_tid_t leds_controller_t::create_thread()
+{
+    k_tid_t tid;
+
+    tid = k_thread_create(&this->thread,
+                          thread_stack, K_THREAD_STACK_SIZEOF(thread_stack),
+                          leds_controller_t::leds_update_thread,
+                          this, nullptr, nullptr,
+                          4, 0, K_NO_WAIT);
+
+    return tid;
+}
+
+void leds_controller_t::leds_update_thread(void *arg1, void *arg2, void *arg3)
+{
+    ARG_UNUSED(arg2);
+    ARG_UNUSED(arg3);
+
+    leds_controller_t *instance_ptr = reinterpret_cast<leds_controller_t *>(arg1);
+    for (;;) {
+        instance_ptr->leds_update();
+        k_msleep(500U);
+    }
+}
+
+void leds_controller_t::leds_update()
+{
+    this->toggle_all();
 }
