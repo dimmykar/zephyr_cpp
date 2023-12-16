@@ -1,7 +1,7 @@
 /**
- * @file           : main.cpp
+ * @file           : leds_controller.hpp
  * @author         : Dmitry Karasev <karasevsdmitry@yandex.ru>
- * @brief          : Main Firmware entry point
+ * @brief          : Board LEDs Controller driver
  ******************************************************************************
  * @attention
  *
@@ -22,35 +22,29 @@
  ******************************************************************************
  */
 
-#include <stdint.h>
-#include <stddef.h>
+#pragma once
 
-#include <zephyr/kernel.h>
-#include <zephyr/logging/log.h>
+#include "led.hpp"
 
-#include "leds_controller.hpp"
 
-LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
-
-/**
- * @brief          The application main loop
- * @return         `0`, but in normal operation the function no returns
- */
-int main(void)
+class leds_controller_t final
 {
-    LOG_INF("Hello from Zephyr RTOS");
+public:
+    static leds_controller_t &get_instance();
 
-    leds_controller_t &leds_ctrl = leds_controller_t::get_instance();
-    if (!leds_ctrl.init()) {
-        LOG_ERR("Failed to initialize leds controller");
-        return 0;
-    }
+    bool init();
+    void toggle_all();
 
-    for (;;)
-    {
-        leds_ctrl.toggle_all();
-        k_msleep(500U);
-    }
+private:
+    leds_controller_t();
 
-    return 0;
-}
+    leds_controller_t(const leds_controller_t &) = delete;
+    leds_controller_t(leds_controller_t &&) = delete;
+    leds_controller_t &operator=(const leds_controller_t &) = delete;
+    leds_controller_t &&operator=(leds_controller_t &&) = delete;
+
+    led_t orange_led;
+    led_t green_led;
+    led_t red_led;
+    led_t blue_led;
+};

@@ -16,6 +16,7 @@ target_sources(
     PRIVATE
         ${FW_SOURCE_DIR}/main.cpp
         ${FW_SOURCE_DIR}/led.cpp
+        ${FW_SOURCE_DIR}/leds_controller.cpp
 )
 
 target_include_directories(
