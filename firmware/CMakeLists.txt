@@ -17,6 +17,7 @@ target_sources(
         ${FW_SOURCE_DIR}/main.cpp
         ${FW_SOURCE_DIR}/gpio.cpp
         ${FW_SOURCE_DIR}/led.cpp
+        ${FW_SOURCE_DIR}/button.cpp
         ${FW_SOURCE_DIR}/leds_controller.cpp
 )
 
