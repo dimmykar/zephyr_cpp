@@ -24,58 +24,147 @@
 
 #include "led.hpp"
 
+#include <functional>
 #include <zephyr/kernel.h>
-#include <zephyr/drivers/gpio.h>
 
-led_t::led_t()
-    : port_ptr(nullptr), pin(0)
+using namespace driver;
+using namespace driver::gpio;
+
+led_t::led_t(const device_t *port_ptr, uint8_t pin, bool is_active_low)
+    : gpio{port_ptr, pin, is_active_low},
+      mode{driver::led_t::mode_t::SOLID},
+      is_silent_blink{false}
 {
-
+    this->reset_blinking();
 }
 
-bool led_t::init(const struct device *port_ptr, gpio_pin_t pin, bool active_low)
+bool led_t::init()
 {
-    int ret;
-
-    if (!device_is_ready(port_ptr)) {
-        return false;
-    }
-
-    ret = gpio_pin_configure(port_ptr, pin, GPIO_OUTPUT_INACTIVE);
-    if (ret < 0) {
-        return false;
-    }
-
-    this->port_ptr = port_ptr;
-    this->pin = pin;
-    this->is_active_low = active_low;
-
-    return true;
-}
-
-bool led_t::turn_on()
-{
-    if (gpio_pin_set(this->port_ptr, this->pin, this->is_active_low ? 0 : 1) < 0) {
+    if (!this->gpio.config_as_output(pin_output_mode_t::PushPull, pin_active_state_t::Inactive)) {
         return false;
     }
 
     return true;
 }
 
-bool led_t::turn_off()
+void led_t::turn_on()
 {
-    if (gpio_pin_set(this->port_ptr, this->pin, this->is_active_low ? 1 : 0) < 0) {
-        return false;
+    this->mode = driver::led_t::mode_t::SOLID;
+    this->reset_blinking();
+    this->gpio.set();
+}
+
+void led_t::turn_off()
+{
+    this->mode = driver::led_t::mode_t::SOLID;
+    this->reset_blinking();
+    this->gpio.reset();
+}
+
+void led_t::set_silent_blink()
+{
+    if (this->mode != driver::led_t::mode_t::BLINK)
+        return;
+
+    this->is_silent_blink = true;
+}
+
+void led_t::reset_silent_blink()
+{
+    if (this->mode != driver::led_t::mode_t::BLINK)
+        return;
+
+    this->is_silent_blink = false;
+}
+
+void led_t::blink(uint32_t on_ms, uint32_t off_ms, size_t blinks_num, uint32_t pend_ms)
+{
+    this->gpio.reset();
+
+    this->mode = driver::led_t::mode_t::BLINK;
+
+    this->config.on_timeout_ms = on_ms;
+    this->config.off_timeout_ms = off_ms;
+    this->config.pend_timeout_ms = pend_ms;
+    this->config.blinks_num = blinks_num;
+
+    this->status.on_ms = on_ms;
+    this->status.off_ms = off_ms;
+    this->status.pend_ms = pend_ms;
+    this->status.blinks_cnt = blinks_num;
+
+    if ((this->config.pend_timeout_ms == 0) && (this->config.blinks_num != 0)) {
+        this->gpio.set();
     }
+}
+
+void led_t::update_ms()
+{
+    if (this->mode == driver::led_t::mode_t::SOLID) {
+        return;
+    }
+
+    std::function<void(void)> turn_on_cb = !this->is_silent_blink ? std::bind(&gpio_t::set, &this->gpio)
+                                                                  : std::bind(&gpio_t::reset, &this->gpio);
+
+    /* Check pending start  */
+    if (this->status.pend_ms != 0) {
+        if (led_t::check_for_counter_zeroing(&this->status.pend_ms))
+            turn_on_cb();
+
+        return;
+    }
+
+    /* Handle ON period */
+    if (led_t::check_for_counter_zeroing(&this->status.on_ms)) {
+        this->gpio.reset();
+
+        if (this->is_blinks_cnt_expired())
+            return;
+
+        this->status.off_ms = this->config.off_timeout_ms;
+    }
+
+    /* Handle OFF period */
+    if (led_t::check_for_counter_zeroing(&this->status.off_ms)) {
+        turn_on_cb();
+        this->status.on_ms = this->config.on_timeout_ms;
+    }
+}
+
+bool led_t::is_blinks_cnt_expired()
+{
+    /* If the counter is set to an infinite value, then we don't check */
+    if (this->config.blinks_num == led_t::BLINK_FOREVER)
+        return false;
+
+    if (!led_t::check_for_counter_zeroing(&this->status.blinks_cnt))
+        return false;
 
     return true;
 }
 
-bool led_t::toggle()
+bool led_t::check_for_counter_zeroing(uint32_t *cnt_ptr)
 {
-    if (gpio_pin_toggle(this->port_ptr, this->pin) < 0) {
-        return false;
+    if (*cnt_ptr != 0) {
+        if (--(*cnt_ptr) == 0)
+            return true;
     }
 
-    return true;
+    return false;
+}
+
+void led_t::reset_blinking()
+{
+    this->config.on_timeout_ms = 0;
+    this->config.off_timeout_ms = 0;
+    this->config.pend_timeout_ms = 0;
+    this->config.blinks_num = 0;
+
+    this->status.on_ms = 0;
+    this->status.off_ms = 0;
+    this->status.pend_ms = 0;
+    this->status.blinks_cnt = 0;
+
+    this->reset_silent_blink();
 }
