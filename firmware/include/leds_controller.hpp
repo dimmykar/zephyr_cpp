@@ -24,9 +24,17 @@
 
 #pragma once
 
+#include <vector>
+#include <zephyr/kernel.h>
 #include "led.hpp"
 
-#include <zephyr/kernel.h>
+enum
+{
+    ORANGE_LED,
+    GREEN_LED,
+    RED_LED,
+    BLUE_LED
+};
 
 class leds_controller_t final
 {
@@ -34,7 +42,12 @@ public:
     static leds_controller_t &get_instance();
 
     bool init();
-    void toggle_all();
+
+    void init_indication();
+    void shutdown_indication();
+
+    void enable_silent_mode();
+    void disable_silent_mode();
 
 private:
     leds_controller_t();
@@ -46,12 +59,8 @@ private:
 
     k_tid_t create_thread();
     static void leds_update_thread(void *arg1, void *arg2, void *arg3);
-    void leds_update();
 
-    led_t orange_led;
-    led_t green_led;
-    led_t red_led;
-    led_t blue_led;
+    std::vector<driver::led_t> leds;
 
     k_thread thread;
     k_tid_t thread_handle;
