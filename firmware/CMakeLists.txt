@@ -14,11 +14,12 @@ set(FW_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/source)
 target_sources(
     app
     PRIVATE
-        ${FW_SOURCE_DIR}/main.cpp
-        ${FW_SOURCE_DIR}/gpio.cpp
-        ${FW_SOURCE_DIR}/led.cpp
-        ${FW_SOURCE_DIR}/button.cpp
-        ${FW_SOURCE_DIR}/leds_controller.cpp
+        ${FW_SOURCE_DIR}/app/main.cpp
+        ${FW_SOURCE_DIR}/app/leds_controller.cpp
+
+        ${FW_SOURCE_DIR}/drivers/gpio.cpp
+        ${FW_SOURCE_DIR}/drivers/led.cpp
+        ${FW_SOURCE_DIR}/drivers/button.cpp
 )
 
 target_include_directories(

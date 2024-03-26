@@ -27,9 +27,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "gpio.hpp"
+#include "drivers/gpio.hpp"
 
-namespace driver
+namespace drivers
 {
 
 /**
@@ -56,7 +56,7 @@ public:
      *                     - failed to configure button GPIO as Input
      *                     - failed to configure button GPIO IRQ Trigger
      */
-    bool init(driver::gpio::pin_pull_t gpio_pull, driver::gpio::pin_irq_trigger_t irq_trigger);
+    bool init(drivers::gpio::pin_pull_t gpio_pull, drivers::gpio::pin_irq_trigger_t irq_trigger);
 
     /**
      * @brief          Get current button state
@@ -74,7 +74,7 @@ private:
     /**
      * @brief          Button GPIO Pin instance
      */
-    driver::gpio::gpio_t gpio;
+    drivers::gpio::gpio_t gpio;
 
     /**
      * @brief          Last button press timestamp, ms

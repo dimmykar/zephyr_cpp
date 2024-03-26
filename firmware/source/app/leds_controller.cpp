@@ -22,14 +22,14 @@
  ******************************************************************************
  */
 
-#include "leds_controller.hpp"
+#include "app/leds_controller.hpp"
 
 #include <zephyr/kernel.h>
 #include <zephyr/kernel/thread_stack.h>
 #include <zephyr/drivers/gpio.h>
 
-using namespace driver;
-using namespace driver::gpio;
+using namespace drivers;
+using namespace drivers::gpio;
 
 namespace
 {

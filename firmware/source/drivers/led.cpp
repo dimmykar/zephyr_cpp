@@ -22,17 +22,17 @@
  ******************************************************************************
  */
 
-#include "led.hpp"
+#include "drivers/led.hpp"
 
 #include <functional>
 #include <zephyr/kernel.h>
 
-using namespace driver;
-using namespace driver::gpio;
+using namespace drivers;
+using namespace drivers::gpio;
 
 led_t::led_t(const device_t *port_ptr, uint8_t pin, bool is_active_low)
     : gpio{port_ptr, pin, is_active_low},
-      mode{driver::led_t::mode_t::SOLID},
+      mode{drivers::led_t::mode_t::SOLID},
       is_silent_blink{false}
 {
     this->reset_blinking();
@@ -49,21 +49,21 @@ bool led_t::init()
 
 void led_t::turn_on()
 {
-    this->mode = driver::led_t::mode_t::SOLID;
+    this->mode = drivers::led_t::mode_t::SOLID;
     this->reset_blinking();
     this->gpio.set();
 }
 
 void led_t::turn_off()
 {
-    this->mode = driver::led_t::mode_t::SOLID;
+    this->mode = drivers::led_t::mode_t::SOLID;
     this->reset_blinking();
     this->gpio.reset();
 }
 
 void led_t::set_silent_blink()
 {
-    if (this->mode != driver::led_t::mode_t::BLINK)
+    if (this->mode != drivers::led_t::mode_t::BLINK)
         return;
 
     this->is_silent_blink = true;
@@ -71,7 +71,7 @@ void led_t::set_silent_blink()
 
 void led_t::reset_silent_blink()
 {
-    if (this->mode != driver::led_t::mode_t::BLINK)
+    if (this->mode != drivers::led_t::mode_t::BLINK)
         return;
 
     this->is_silent_blink = false;
@@ -81,7 +81,7 @@ void led_t::blink(uint32_t on_ms, uint32_t off_ms, size_t blinks_num, uint32_t p
 {
     this->gpio.reset();
 
-    this->mode = driver::led_t::mode_t::BLINK;
+    this->mode = drivers::led_t::mode_t::BLINK;
 
     this->config.on_timeout_ms = on_ms;
     this->config.off_timeout_ms = off_ms;
@@ -100,7 +100,7 @@ void led_t::blink(uint32_t on_ms, uint32_t off_ms, size_t blinks_num, uint32_t p
 
 void led_t::update_ms()
 {
-    if (this->mode == driver::led_t::mode_t::SOLID) {
+    if (this->mode == drivers::led_t::mode_t::SOLID) {
         return;
     }
 

@@ -22,19 +22,19 @@
  ******************************************************************************
  */
 
-#include "button.hpp"
+#include "drivers/button.hpp"
 
 #include <zephyr/kernel.h>
 
-using namespace driver;
-using namespace driver::gpio;
+using namespace drivers;
+using namespace drivers::gpio;
 
 button_t::button_t(const device_t *port_ptr, uint8_t pin, bool is_active_low)
     : gpio{port_ptr, pin, is_active_low}, press_tstamp{0}
 {
 }
 
-bool button_t::init(driver::gpio::pin_pull_t gpio_pull, driver::gpio::pin_irq_trigger_t irq_trigger)
+bool button_t::init(drivers::gpio::pin_pull_t gpio_pull, drivers::gpio::pin_irq_trigger_t irq_trigger)
 {
     if (!this->gpio.config_as_input(gpio_pull))
     {

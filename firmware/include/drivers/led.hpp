@@ -28,9 +28,9 @@
 #include <stddef.h>
 #include <limits>
 
-#include "gpio.hpp"
+#include "drivers/gpio.hpp"
 
-namespace driver
+namespace drivers
 {
 
 /**
@@ -156,7 +156,7 @@ private:
     /**
      * @brief          LED GPIO Pin instance
      */
-    driver::gpio::gpio_t gpio;
+    drivers::gpio::gpio_t gpio;
 
     /**
      * @brief          LED driver operation mode

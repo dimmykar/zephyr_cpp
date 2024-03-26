@@ -26,7 +26,7 @@
 
 #include <vector>
 #include <zephyr/kernel.h>
-#include "led.hpp"
+#include "drivers/led.hpp"
 
 enum
 {
@@ -60,7 +60,7 @@ private:
     k_tid_t create_thread();
     static void leds_update_thread(void *arg1, void *arg2, void *arg3);
 
-    std::vector<driver::led_t> leds;
+    std::vector<drivers::led_t> leds;
 
     k_thread thread;
     k_tid_t thread_handle;

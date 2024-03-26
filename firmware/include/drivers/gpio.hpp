@@ -32,7 +32,7 @@ using device_t = struct device;
 using gpio_callback_t = struct gpio_callback;
 using gpio_irq_handler_fn = void (*)(void *);
 
-namespace driver
+namespace drivers
 {
 
 namespace gpio

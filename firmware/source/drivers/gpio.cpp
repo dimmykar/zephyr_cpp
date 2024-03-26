@@ -22,11 +22,11 @@
  ******************************************************************************
  */
 
-#include "gpio.hpp"
+#include "drivers/gpio.hpp"
 
 #include <zephyr/kernel.h>
 
-using namespace driver::gpio;
+using namespace drivers::gpio;
 
 gpio_t::gpio_t(const device_t *port_ptr, uint8_t pin, bool is_active_low)
     : port_ptr(port_ptr), pin(pin), is_active_low(is_active_low)
